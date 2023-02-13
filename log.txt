@@ -4,3 +4,9 @@ Timestamp: Thu Feb 09 2023 15:51:59 GMT+0100 (Mitteleuropäische Normalzeit)
 URL: /favicon.ico
 Timestamp: Thu Feb 09 2023 15:51:59 GMT+0100 (Mitteleuropäische Normalzeit)
 
+URL: /
+Timestamp: Thu Feb 09 2023 16:33:34 GMT+0100 (Mitteleuropäische Normalzeit)
+
+URL: /favicon.ico
+Timestamp: Thu Feb 09 2023 16:33:34 GMT+0100 (Mitteleuropäische Normalzeit)
+
