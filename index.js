@@ -1,75 +1,275 @@
 const express = require("express");
-morgan = require("morgan");
-const app = express();
+(app = express()),
+  (morgan = require("morgan")),
+  (bodyParser = require("body-parser")),
+  (uuid = require("uuid"));
 
-// topMovies Array
-let topMovies = [
+app.use(bodyParser.json());
+
+// users Array
+let users = [
   {
-    title: "Dallas Buyers Club",
-    director: "Jean-Marc Vallée",
+    id: "1",
+    name: "Marcus",
+    favoriteMovie: [],
   },
   {
-    title: "Twelve years a slave",
-    director: "Steve McQueen",
+    id: "2",
+    name: "Jane",
+    favoriteMovie: ["Moon"],
   },
   {
-    title: "Three Billboards Outside Ebbing, Missouri",
-    director: "Martin McDonagh",
-  },
-  {
-    title: "Zero Dark Thirty",
-    director: "Kathryn Bigelow",
-  },
-  {
-    title: "Moon",
-    director: "Duncan Jones",
-  },
-  {
-    title: "Enemy",
-    director: "Denis Villeneuve",
-  },
-  {
-    title: "The Tree of Life",
-    director: "Terrence Malick",
-  },
-  {
-    title: "City of God",
-    director: "Fernando Meirelles",
-  },
-  {
-    title: "Bang Boom Bang",
-    director: "Peter Thorwarth",
-  },
-  {
-    title: "Head-On",
-    director: "Fatih Akin",
+    id: "3",
+    name: "Anna",
+    favoriteMovie: ["Enemy"],
   },
 ];
 
-// Morgan comman output
+// Movies Array
+let movies = [
+  {
+    title: "Dallas Buyers Club",
+    genre: "Drama",
+    director: {
+      name: "Jean-Marc Vallée",
+      bio: "placeholder bio",
+      birth: "1963",
+    },
+  },
+  {
+    title: "Twelve years a slave",
+    genre: "Drama",
+    director: {
+      name: "Steve McQueen",
+      bio: "placeholder bio",
+      birth: "1975",
+    },
+  },
+  {
+    title: "Three Billboards Outside Ebbing, Missouri",
+    genre: "Drama",
+    director: {
+      name: "Martin McDonagh",
+      bio: "placeholder bio",
+      birth: "1958",
+    },
+  },
+  {
+    title: "Zero Dark Thirty",
+    genre: "Drama",
+    director: {
+      name: "Kathryn Bigelow",
+      bio: "placeholder bio",
+      birth: "1964",
+    },
+  },
+  {
+    title: "Moon",
+    genre: "Action",
+    director: {
+      name: "Duncan Jones",
+      bio: "placeholder bio",
+      birth: "1981",
+    },
+  },
+  {
+    title: "Enemy",
+    genre: "Thriller",
+    director: {
+      name: "Denis Villeneuve",
+      bio: "placeholder bio",
+      birth: "1971",
+    },
+  },
+  {
+    title: "The Tree of Life",
+    genre: "Drama",
+    director: {
+      name: "Terrence Malick",
+      bio: "placeholder bio",
+      birth: "1954",
+    },
+  },
+  {
+    title: "City of God",
+    genre: "Drama",
+    director: {
+      name: "Fernando Meirelles",
+      bio: "placeholder bio",
+      birth: "1985",
+    },
+  },
+  {
+    title: "Bang Boom Bang",
+    genre: "Comedy",
+    director: {
+      name: "Peter Thorwarth",
+      bio: "placeholder bio",
+      birth: "1982",
+    },
+  },
+  {
+    title: "Head-On",
+    genre: "Drama",
+    director: {
+      name: "Fatih Akin",
+      bio: "placeholder bio",
+      birth: "1976",
+    },
+  },
+];
+
+//CREATE
+app.post("/users", (req, res) => {
+  const newUser = req.body;
+
+  if (newUser.name) {
+    newUser.id = uuid.v4();
+    users.push(newUser);
+    res.status(201).json(newUser);
+  } else {
+    res.status(400).send("User needs a name");
+  }
+});
+
+//UPDATE
+app.put("/users/:id", (req, res) => {
+  const { id } = req.params;
+  const updatedUser = req.body;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.name = updatedUser.name;
+    res.status(200).json(user);
+  } else {
+    res.status(400).send("No such user in Databse");
+  }
+});
+
+//CREATE
+app.post("/users", (req, res) => {
+  const newUser = req.body;
+
+  if (newUser.name) {
+    newUser.id = uuid.v4();
+    users.push(newUser);
+    res.status(201).json(newUser);
+  } else {
+    res.status(400).send("User needs a name");
+  }
+});
+
+//UPDATE
+app.put("/users/:id", (req, res) => {
+  const { id } = req.params;
+  const updatedUser = req.body;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.name = updatedUser.name;
+    res.status(200).json(user);
+  } else {
+    res.status(400).send("No such User in Database");
+  }
+});
+
+//CREATE
+app.post("/users/:id/:movieTitle", (req, res) => {
+  const { id, movieTitle } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.favoriteMovie.push(movieTitle);
+    res.status(200).send(`${movieTitle} has been added to user ${id}'s array`);
+  } else {
+    res.status(400).send("no such user");
+  }
+});
+
+//DELETE
+app.delete("/users/:id/:movieTitle", (req, res) => {
+  const { id, movieTitle } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.favoriteMovie = user.favoriteMovie.filter(
+      (title) => title !== movieTitle
+    );
+    res
+      .status(200)
+      .send(`${movieTitle} has been removed from user ${id}'s array`);
+  } else {
+    res.status(400).send("no such user");
+  }
+});
+
+//DELETE
+app.delete("/users/:id", (req, res) => {
+  const { id } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    users = users.filter((user) => user.id != id);
+    //res.json(users)
+    res.status(200).send(`user ${id} has been deleted`);
+  } else {
+    res.status(400).send("No such User in Database");
+  }
+});
+
+//READ (GET requests)
+app.get("/movies", (req, res) => {
+  res.status(200).json(movies);
+});
+
+// Get get movie by title
+
+app.get("/movies/:title", (req, res) => {
+  const { title } = req.params;
+  const movie = movies.find((movie) => movie.title === title);
+
+  if (movie) {
+    res.status(200).json(movie);
+  } else {
+    res.status(400).send("No such Movie in Database");
+  }
+});
+
+// Get get movie by genre
+
+app.get("/movies/genre/:genreName", (req, res) => {
+  const { genreName } = req.params;
+  const genre = movies.find((movie) => movie.genre.name === genreName).genre;
+
+  if (genre) {
+    res.status(200).json(genre);
+  } else {
+    res.status(400).send("this genre doesn't exist!");
+  }
+});
+
+// Get get movie by director
+
+app.get("/movies/directors/:directorName", (req, res) => {
+  const { directorName } = req.params;
+  const director = movies.find(
+    (movie) => movie.director.name === directorName
+  ).director;
+
+  if (director) {
+    res.status(200).json(director);
+  } else {
+    res.status(400).send("No such Director in Database");
+  }
+});
+
 app.use(express.static("public"));
 app.use(morgan("common"));
-
-// App get root
-app.get("/", (req, res) => {
-  res.send("My topMovies");
-});
-
-// Json
-app.get("/movies", (req, res) => {
-  res.json(topMovies);
-});
-
-// Documentation
-app.get("/documentation", (req, res) => {
-  res.sendFile("public/documentation.html", { root: __dirname });
-});
-
-// Error-Handling
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Somethin went wrong");
-});
 
 // app.listen console.log
 app.listen(8080, () => {
