@@ -5,6 +5,8 @@ const express = require("express");
   (uuid = require("uuid"));
 
 app.use(bodyParser.json());
+app.use(express.static("public"));
+app.use(morgan("common"));
 
 // users Array
 let users = [
@@ -211,24 +213,22 @@ app.get("/movies/:title", (req, res) => {
   }
 });
 
-// Get get movie by genre
+// GEt Movie by Genre
 app.get("/movies/genre/:genreName", (req, res) => {
   const { genreName } = req.params;
-  const genre = movies.find((movie) => movie.genre.name === genreName).genre;
+  const genreMovies = movies.filter((movie) => movie.genre === genreName);
 
-  if (genre) {
-    res.status(200).json(genre);
+  if (genreMovies.length === 0) {
+    res.status(400).send("This genre doesn't exist!");
   } else {
-    res.status(400).send("this genre doesn't exist!");
+    res.status(200).json(genreMovies);
   }
 });
 
 // Get get movie by director
 app.get("/movies/directors/:directorName", (req, res) => {
   const { directorName } = req.params;
-  const director = movies.find(
-    (movie) => movie.director.name === directorName
-  ).director;
+  const directorMovies = movies.find((movie) => movie.director.name === directorName);
 
   if (director) {
     res.status(200).json(director);
@@ -237,8 +237,7 @@ app.get("/movies/directors/:directorName", (req, res) => {
   }
 });
 
-app.use(express.static("public"));
-app.use(morgan("common"));
+
 
 // app.listen console.log
 app.listen(8080, () => {
