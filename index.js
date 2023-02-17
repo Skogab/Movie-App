@@ -228,16 +228,16 @@ app.get("/movies/genre/:genreName", (req, res) => {
 // Get get movie by director
 app.get("/movies/directors/:directorName", (req, res) => {
   const { directorName } = req.params;
-  const directorMovies = movies.find((movie) => movie.director.name === directorName);
+  const directorMovies = movies.filter(
+    (movie) => movie.director.name === directorName
+  );
 
-  if (director) {
-    res.status(200).json(director);
+  if (directorMovies.length > 0) {
+    res.status(200).json(directorMovies);
   } else {
     res.status(400).send("No such Director in Database");
   }
 });
-
-
 
 // app.listen console.log
 app.listen(8080, () => {
