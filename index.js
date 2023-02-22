@@ -1,3 +1,22 @@
+const bodyParser = require("body-parser");
+const express = require("express");
+const app = express();
+const uuid = require("uuid");
+const morgan = require("morgan");
+const fs = require("fs");
+const path = require("path");
+const mongoose = require('mongoose');
+const Models = require('./models.js')
+
+const Movies = Models.Movie;
+const Users = Models.User;
+
+mongoose.connect("mongodb://localhost:27017/cfDB", {
+   useNewUrlParser: true,
+   useUnifiedTopology: true
+});
+
+
 const express = require("express");
 (app = express()),
   (morgan = require("morgan")),
@@ -121,18 +140,71 @@ let movies = [
   },
 ];
 
-//CREATE
-app.post("/users", (req, res) => {
-  const newUser = req.body;
-
-  if (newUser.name) {
-    newUser.id = uuid.v4();
-    users.push(newUser);
-    res.status(201).json(newUser);
-  } else {
-    res.status(400).send("User needs a name");
-  }
+//Add a user
+/* We’ll expect JSON in this format
+{
+  ID: Integer,
+  Username: String,
+  Password: String,
+  Email: String,
+  Birthday: Date
+}*/
+app.post('/users', (req, res) => {
+  Users.findOne({ Username: req.body.Username })
+    .then((user) => {
+      if (user) {
+        return res.status(400).send(req.body.Username + 'already exists');
+      } else {
+        Users
+          .create({
+            Username: req.body.Username,
+            Password: req.body.Password,
+            Email: req.body.Email,
+            Birthday: req.body.Birthday
+          })
+          .then((user) =>{res.status(201).json(user) })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).send('Error: ' + error);
+        })
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    });
 });
+
+
+// Get all users
+app.get('/users', (req, res) => {
+  Users.find()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
+
+// Get a user by username
+app.get('/users/:Username', (req, res) => {
+  Users.findOne({ Username: req.params.Username })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
+
+
+
+
 
 //UPDATE update user
 app.put("/users/:id", (req, res) => {
