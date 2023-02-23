@@ -1,21 +1,14 @@
-const bodyParser = require("body-parser");
-const express = require("express");
-const app = express();
-const uuid = require("uuid");
-const morgan = require("morgan");
-const fs = require("fs");
-const path = require("path");
 const mongoose = require('mongoose');
-const Models = require('./models.js')
+const Models = require('./models.js');
 
 const Movies = Models.Movie;
 const Users = Models.User;
 
-mongoose.connect("mongodb://localhost:27017/cfDB", {
-   useNewUrlParser: true,
-   useUnifiedTopology: true
-});
 
+const fs = require("fs");
+const path = require("path");
+
+mongoose.connect('mongodb://localhost:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const express = require("express");
 (app = express()),
@@ -26,6 +19,8 @@ const express = require("express");
 app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(morgan("common"));
+
+
 
 // users Array
 let users = [
