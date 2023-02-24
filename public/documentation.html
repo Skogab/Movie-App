@@ -80,9 +80,14 @@
         <td>Allows users to update their user info</td>
         <td>/users/:Username</td>
         <td>PUT</td>
-        <td>:Username</td>
+        <td>:Username</td> 
         <td>-</td>
         <td>A JSON object holding data about the updated user information</td>
+        "Username": "String",
+        "Password": "String",
+        "Email": "String","Birthday": "Date"
+
+        Username is required
       </tr>
     
       <tr>
@@ -92,6 +97,13 @@
         <td>:Username, :MovieID</td>
         <td>-</td>
         <td>A JSON object holding data about the user and the movie that was added</td>
+        "Title": "String",
+        "GenreName": "String"
+        "DirectorName": "String"
+        "DireccorBirth": "String"
+        
+        Title is required
+        MovieID is required
       </tr>
     
       <tr>

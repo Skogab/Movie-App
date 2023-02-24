@@ -5,10 +5,14 @@ const Movies = Models.Movie;
 const Users = Models.User;
 
 
+
+mongoose.set("strictQuery", true);
+
+
 const fs = require("fs");
 const path = require("path");
 
-mongoose.connect('mongodb://localhost:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://127.0.0.1:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const express = require("express");
 (app = express()),
@@ -22,121 +26,50 @@ app.use(morgan("common"));
 
 
 
-// users Array
-let users = [
-  {
-    id: "1",
-    name: "Marcus",
-    favoriteMovie: [],
-  },
-  {
-    id: "2",
-    name: "Jane",
-    favoriteMovie: ["Moon"],
-  },
-  {
-    id: "3",
-    name: "Anna",
-    favoriteMovie: ["Enemy"],
-  },
-];
 
-// Movies Array
-let movies = [
-  {
-    title: "Dallas Buyers Club",
-    genre: "Drama",
-    director: {
-      name: "Jean-Marc Vallée",
-      bio: "placeholder bio",
-      birth: "1963",
-    },
-  },
-  {
-    title: "Twelve years a slave",
-    genre: "Drama",
-    director: {
-      name: "Steve McQueen",
-      bio: "placeholder bio",
-      birth: "1975",
-    },
-  },
-  {
-    title: "Three Billboards Outside Ebbing, Missouri",
-    genre: "Drama",
-    director: {
-      name: "Martin McDonagh",
-      bio: "placeholder bio",
-      birth: "1958",
-    },
-  },
-  {
-    title: "Zero Dark Thirty",
-    genre: "Drama",
-    director: {
-      name: "Kathryn Bigelow",
-      bio: "placeholder bio",
-      birth: "1964",
-    },
-  },
-  {
-    title: "Moon",
-    genre: "Action",
-    director: {
-      name: "Duncan Jones",
-      bio: "placeholder bio",
-      birth: "1981",
-    },
-  },
-  {
-    title: "Enemy",
-    genre: "Thriller",
-    director: {
-      name: "Denis Villeneuve",
-      bio: "placeholder bio",
-      birth: "1971",
-    },
-  },
-  {
-    title: "The Tree of Life",
-    genre: "Drama",
-    director: {
-      name: "Terrence Malick",
-      bio: "placeholder bio",
-      birth: "1954",
-    },
-  },
-  {
-    title: "City of God",
-    genre: "Drama",
-    director: {
-      name: "Fernando Meirelles",
-      bio: "placeholder bio",
-      birth: "1985",
-    },
-  },
-  {
-    title: "Bang Boom Bang",
-    genre: "Comedy",
-    director: {
-      name: "Peter Thorwarth",
-      bio: "placeholder bio",
-      birth: "1982",
-    },
-  },
-  {
-    title: "Head-On",
-    genre: "Drama",
-    director: {
-      name: "Fatih Akin",
-      bio: "placeholder bio",
-      birth: "1976",
-    },
-  },
-];
+// Get all movies
+app.get('/movies', (req, res) => {
+  Movies.find()
+    .then((movies) => {
+      res.status(200).json(movies);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+}); 
 
-//Add a user
-/* We’ll expect JSON in this format
+
+// Get all users
+app.get('/users', (req, res) => {
+  Users.find()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
+
+
+// Get a user by username
+app.get('/users/:Username', (req, res) => {
+  Users.findOne({ Username: req.params.Username })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+
+
+
+//Add a user JSON
+/* JSON
 {
   ID: Integer,
   Username: String,
@@ -171,24 +104,104 @@ app.post('/users', (req, res) => {
 });
 
 
-// Get all users
-app.get('/users', (req, res) => {
-  Users.find()
-    .then((users) => {
-      res.status(201).json(users);
+//Add a Movie JSON
+/* 
+{
+  ID: Integer,
+  Tile: String,
+  Genre Name: String,
+  Director Name: String,
+  Director Birth: String
+}*/
+app.post('/movies', (req, res) => {
+  Movies.findOne({ Title: req.body.Title })
+    .then((movie) => {
+      if (movie) {
+        return res.status(400).send(req.body.Title + 'already exists');
+      } else {
+        Movies
+        .create({
+          Title: req.body.Title,
+          Genre: {
+            Name: req.body.GenreName
+          },
+          Director: {
+            Name: req.body.DirectorName,
+            Birth: req.body.DirectorBirth
+          },
+          })
+          .then((user) =>{res.status(201).json(user) })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).send('Error: ' + error);
+        })
+      }
     })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
     });
 });
 
 
-// Get a user by username
-app.get('/users/:Username', (req, res) => {
-  Users.findOne({ Username: req.params.Username })
+
+// Add a movie to a user's list of favorites
+app.post('/users/:Username/movies/:MovieID', (req, res) => {
+  Users.findOneAndUpdate({ Username: req.params.Username }, {
+       $push: { FavoriteMovies: req.params.MovieID }
+     },
+     { new: true }, // This line makes sure that the updated document is returned
+    (err, updatedUser) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+      } else {
+        res.json(updatedUser);
+      }
+    });
+  });  
+
+
+// Update a user's info, by username JSON
+/* 
+{
+  Username: String, (required)
+  Password: String, (required)
+  Email: String,(required)
+  Birthday: Date
+}*/
+app.put('/users/:Username', (req, res) => {
+  Users.findOneAndUpdate({ Username: req.params.Username }, { $set:
+    {
+      Username: req.body.Username,
+      Password: req.body.Password,
+      Email: req.body.Email,
+      Birthday: req.body.Birthday
+    }
+  },
+  { new: true }, // This line makes sure that the updated document is returned
+  (err, updatedUser) => {
+    if(err) {  // also .then .catch function is possible here
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    } else {
+      res.json(updatedUser);
+    }
+  });
+});
+
+
+
+
+// Delete a user by username
+app.delete('/users/:Username', (req, res) => {
+  Users.findOneAndRemove({ Username: req.params.Username })
     .then((user) => {
-      res.json(user);
+      if (!user) {
+        res.status(400).send(req.params.Username + ' was not found');
+      } else {
+        res.status(200).send(req.params.Username + ' was deleted.');
+      }
     })
     .catch((err) => {
       console.error(err);
@@ -196,113 +209,6 @@ app.get('/users/:Username', (req, res) => {
     });
 });
 
-
-
-
-
-
-//UPDATE update user
-app.put("/users/:id", (req, res) => {
-  const { id } = req.params;
-  const updatedUser = req.body;
-
-  let user = users.find((user) => user.id == id);
-
-  if (user) {
-    user.name = updatedUser.name;
-    res.status(200).json(user);
-  } else {
-    res.status(400).send("No such user in Databse");
-  }
-});
-
-//CREATE create movietitle
-app.post("/users/:id/:movieTitle", (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find((user) => user.id == id);
-
-  if (user) {
-    user.favoriteMovie.push(movieTitle);
-    res.status(200).send(`${movieTitle} has been added to user ${id}'s array`);
-  } else {
-    res.status(400).send("no such user");
-  }
-});
-
-//DELETE delete a movie
-app.delete("/users/:id/:movieTitle", (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find((user) => user.id == id);
-
-  if (user) {
-    user.favoriteMovie = user.favoriteMovie.filter(
-      (title) => title !== movieTitle
-    );
-    res
-      .status(200)
-      .send(`${movieTitle} has been removed from user ${id}'s array`);
-  } else {
-    res.status(400).send("no such user");
-  }
-});
-
-//DELETE deltet a user
-app.delete("/users/:id", (req, res) => {
-  const { id } = req.params;
-
-  let user = users.find((user) => user.id == id);
-
-  if (user) {
-    users = users.filter((user) => user.id != id);
-    //res.json(users)
-    res.status(200).send(`user ${id} has been deleted`);
-  } else {
-    res.status(400).send("No such User in Database");
-  }
-});
-
-//READ (GET requests)
-app.get("/movies", (req, res) => {
-  res.status(200).json(movies);
-});
-
-// Get get movie by title
-app.get("/movies/:title", (req, res) => {
-  const { title } = req.params;
-  const movie = movies.find((movie) => movie.title === title);
-
-  if (movie) {
-    res.status(200).json(movie);
-  } else {
-    res.status(400).send("No such Movie in Database");
-  }
-});
-
-// GEt Movie by Genre
-app.get("/movies/genre/:genreName", (req, res) => {
-  const { genreName } = req.params;
-  const genreMovies = movies.filter((movie) => movie.genre === genreName);
-
-  if (genreMovies.length === 0) {
-    res.status(400).send("This genre doesn't exist!");
-  } else {
-    res.status(200).json(genreMovies);
-  }
-});
-
-// Get get movie by director
-app.get("/movies/directors/:directorName", (req, res) => {
-  const { directorName } = req.params;
-  const directorMovies = movies.filter((movie) => movie.director.name === directorName);
-
-  if (directorMovies.length > 0) {
-    res.status(200).json(directorMovies);
-  } else {
-    res.status(400).send("No such director in database");
-  }
-});
 
 
 
