@@ -1,13 +1,12 @@
+
+
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 
 const Movies = Models.Movie;
 const Users = Models.User;
 
-
-
 mongoose.set("strictQuery", true);
-
 
 const fs = require("fs");
 const path = require("path");
@@ -21,23 +20,31 @@ const express = require("express");
   (uuid = require("uuid"));
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+let auth = require('./auth')(app);
+const passport = require('passport');
+require('./passport');
 app.use(express.static("public"));
 app.use(morgan("common"));
 
 
 
 
+
+
+
+
 // Get all movies
-app.get('/movies', (req, res) => {
+app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
     .then((movies) => {
-      res.status(200).json(movies);
+      res.status(201).json(movies);
     })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
     });
-}); 
+});
 
 
 // Get all users
