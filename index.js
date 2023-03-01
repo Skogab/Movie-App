@@ -8,12 +8,17 @@ const Users = Models.User;
 
 const { check, validationResult } = require('express-validator');
 
-mongoose.set("strictQuery", true);
+mongoose.set("strictQuery", false);
 
 const fs = require("fs");
 const path = require("path");
 
-mongoose.connect('mongodb://127.0.0.1:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// mongoose.connect("mongodb+srv://Skogaby:Dortmund-10@mycluster.qhedpeb.mongodb.net/cfDB?retryWrites=true&w=majority")
+
+// mongoose.connect('mongodb://127.0.0.1:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const express = require("express");
 (app = express()),
