@@ -25,6 +25,8 @@ const passport = require('passport');
 require('./passport');
 app.use(express.static("public"));
 app.use(morgan("common"));
+// Morgan middleware to log requests
+app.use(morgan('dev'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -35,10 +37,13 @@ app.use(cors());
 
 
 
-
-
-
 /* rest of code goes here*/
+
+
+// GET route for the root endpoint
+app.get('/', (req, res) => {
+  res.send('Hello and welcome to my My Movie App!');
+});
 
 
 
