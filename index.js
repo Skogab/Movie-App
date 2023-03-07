@@ -13,12 +13,28 @@ mongoose.set("strictQuery", false);
 const fs = require("fs");
 const path = require("path");
 
+// LOCAL
+//mongoose.connect('mongodb://127.0.0.1:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
-// mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+// HEROKU
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-// mongoose.connect("mongodb+srv://Skogaby:Dortmund-10@mycluster.qhedpeb.mongodb.net/cfDB?retryWrites=true&w=majority")
 
-// mongoose.connect('mongodb://127.0.0.1:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
+//Connect to online MongoDB Atlas database
+// mongoose.connect('mongodb+srv://Skogaby:Dortmund-10@mycluster.qhedpeb.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
+//  .then(() => {
+////    console.log('Successfully connected to MongoDB Atlas database!');
+ 
+////  })
+////  .catch((err) => {
+////    console.error('Error connecting to MongoDB Atlas database: ', err.message);
+//  });
+
+
+
+ 
+
+
 
 const express = require("express");
 (app = express()),
