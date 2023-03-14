@@ -158,48 +158,6 @@ app.post('/users',
 });
 
 
-//Add a Movie JSON
-/* 
-{
-  ID: Integer,
-  Tile: String,
-  Description: String,
-  Genre Name: String,
-  Director Name: String,
-  Director Birth: String
-}*/
-/* app.post('/movies', (req, res) => {
-  Movies.findOne({ Title: req.body.Title })
-    .then((movie) => {
-      if (movie) {
-        return res.status(400).send(req.body.Title + 'already exists');
-      } else {
-        Movies
-        .create({
-          Title: req.body.Title,
-          Description: req.body.Description,
-          Genre: {
-            Name: req.body.GenreName,
-            Description: req.body.GenreDescription,
-          },
-          Director: {
-            Name: req.body.DirectorName,
-            Birth: req.body.DirectorBirth
-          },
-          })
-          .then((user) =>{res.status(201).json(user) })
-        .catch((error) => {
-          console.error(error);
-          res.status(500).send('Error: ' + error);
-        })
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error: ' + error);
-    });
-}); */
-
 
 
 // Add a movie to a user's list of favorites
