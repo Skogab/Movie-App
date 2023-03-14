@@ -15,27 +15,9 @@ const path = require("path");
 
 require('dotenv').config()
 
-// LOCAL
-//mongoose.connect('mongodb://127.0.0.1:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 // HEROKU
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-
-//Connect to online MongoDB Atlas database
-// mongoose.connect('mongodb+srv://Skogaby:Dortmund-10@mycluster.qhedpeb.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
-//  .then(() => {
-////    console.log('Successfully connected to MongoDB Atlas database!');
- 
-////  })
-////  .catch((err) => {
-////    console.error('Error connecting to MongoDB Atlas database: ', err.message);
-//  });
-
-
-
- 
-
 
 
 const express = require("express");
@@ -59,8 +41,6 @@ app.use(cors());
 
 
 
-
-/* rest of code goes here*/
 
 
 // GET route for the root endpoint
@@ -114,9 +94,6 @@ app.get('/users/:Username', (req, res) => {
 //Add a user
 
 app.post('/users',
-  // Validation logic here for request
-  //you can either use a chain of methods like .not().isEmpty() ???
-  //which means "opposite of isEmpty" in plain english "is not empty" ???
   [
     check('Username', 'Username is required').isLength({min: 5}),
     check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
@@ -162,9 +139,6 @@ app.post('/users',
 
 // Add a movie to a user's list of favorites
 app.post('/users/:Username/movies/:MovieID',
-  // Validation logic here for request
-  //you can either use a chain of methods like .not().isEmpty() ???
-  //which means "opposite of isEmpty" in plain english "is not empty" ???
   [
     check('Username', 'Username is required').isLength({min: 5}),
     check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
@@ -195,9 +169,6 @@ app.post('/users/:Username/movies/:MovieID',
 
 // Update a user's info
 app.put('/users/:Username',
-  // Validation logic here for request
-  //you can either use a chain of methods like .not().isEmpty()
-  //which means "opposite of isEmpty" in plain english "is not empty
   [
     check('Username', 'Username is required').isLength({min: 5}),
     check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
