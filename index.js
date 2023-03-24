@@ -13,7 +13,7 @@ mongoose.set("strictQuery", false);
 const fs = require("fs");
 const path = require("path");
 
-require('dotenv').config()
+require('dotenv').config();
 
 
 // HEROKU
