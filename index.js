@@ -6,6 +6,9 @@ const Models = require('./models.js');
 const Movies = Models.Movie;
 const Users = Models.User;
 
+// HEROKU
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
 const { check, validationResult } = require('express-validator');
 
 mongoose.set("strictQuery", false);
@@ -117,7 +120,7 @@ app.post('/users',
         Users
           .create({
             Username: req.body.Username,
-            Password: hashedPassword, // hashed password
+            Password: hashedPassword, 
             Email: req.body.Email,
             Birthday: req.body.Birthday
           })
