@@ -52,6 +52,33 @@ app.get("/movies", (req, res) => {
 		});
 });
 
+// Get a movie by title
+app.get("/movies/:title", (req, res) => {
+	Movies.findOne({
+		title: req.params.title,
+	})
+		.then((movie) => {
+			res.status(200).json(movie);
+		})
+		.catch((err) => {
+			console.error(err);
+			res.status(500).send("Error: " + err);
+		});
+});
+
+// Get movies by genre
+app.get("/movies/genre/:genre", (req, res) => {
+	const genre = req.params.genre;
+	Movies.find({ "Genre.Name": genre })
+		.then((movies) => {
+			res.status(200).json(movies);
+		})
+		.catch((err) => {
+			console.error(err);
+			res.status(500).send("Error: " + err);
+		});
+});
+
 // Get all users
 app.get("/users", (req, res) => {
 	Users.find()
