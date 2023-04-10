@@ -66,7 +66,7 @@ app.get("/movies/:title", (req, res) => {
 		});
 });
 
-// Get movies by genre
+/// Get movies by genre
 app.get("/movies/genre/:genre", (req, res) => {
 	const genre = req.params.genre;
 	Movies.find({ "Genre.Name": genre })
