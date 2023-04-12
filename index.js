@@ -1,23 +1,18 @@
 const mongoose = require("mongoose");
 const Models = require("./models.js");
-
 const Movies = Models.Movie;
 const Users = Models.User;
 
 // HEROKU
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.set("strictQuery", false);
 
 const { check, validationResult } = require("express-validator");
-
-mongoose.set("strictQuery", false);
 
 const fs = require("fs");
 const path = require("path");
 
 require("dotenv").config();
-
-// HEROKU
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const express = require("express");
 (app = express()), (morgan = require("morgan")), (bodyParser = require("body-parser")), (uuid = require("uuid"));
@@ -26,7 +21,6 @@ const passport = require("passport");
 require("./passport");
 app.use(express.static("public"));
 app.use(morgan("common"));
-// Morgan middleware to log requests
 app.use(morgan("dev"));
 
 app.use(bodyParser.json());
