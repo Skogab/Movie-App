@@ -31,11 +31,11 @@ app.use(cors());
 
 // GET route for the root endpoint
 app.get("/", (req, res) => {
-	res.send("Hello and welcome to my My Movie App!");
+	res.send("Hello and welcome to my My Movie App! <br><br> Click <a href='/documentation'>here</a> for documentation.");
 });
 
 // Get all movies
-app.get("/movies", (req, res) => {
+app.get("/movies", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Movies.find()
 		.then((movies) => {
 			res.status(200).json(movies);
@@ -47,7 +47,7 @@ app.get("/movies", (req, res) => {
 });
 
 // Get a movie by title
-app.get("/movies/:title", (req, res) => {
+app.get("/movies/:title", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Movies.findOne({
 		title: req.params.title,
 	})
@@ -61,7 +61,7 @@ app.get("/movies/:title", (req, res) => {
 });
 
 /// Get movies by genre
-app.get("/movies/genre/:genre", (req, res) => {
+app.get("/movies/genre/:genre", passport.authenticate("jwt", { session: false }), (req, res) => {
 	const genre = req.params.genre;
 	Movies.find({ "Genre.Name": genre })
 		.then((movies) => {
@@ -74,7 +74,7 @@ app.get("/movies/genre/:genre", (req, res) => {
 });
 
 // Get all users
-app.get("/users", (req, res) => {
+app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Users.find()
 		.then((users) => {
 			res.status(201).json(users);
@@ -86,7 +86,7 @@ app.get("/users", (req, res) => {
 });
 
 // Get a user by username
-app.get("/users/:Username", (req, res) => {
+app.get("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Users.findOne({ Username: req.params.Username })
 		.then((user) => {
 			res.json(user);
@@ -98,7 +98,6 @@ app.get("/users/:Username", (req, res) => {
 });
 
 //Add a user
-
 app.post(
 	"/users",
 	[
@@ -143,7 +142,50 @@ app.post(
 	}
 );
 
-// Add a movie to a user's list of favorites
+// Update a user's info
+app.put(
+	"/users/:Username",
+	[
+		check("Username", "Username is required").isLength({ min: 5 }),
+		check("Username", "Username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
+		check("Password", "Password is required").not().isEmpty(),
+		check("Email", "Email does not appear to be valid").isEmail(),
+	],
+	(req, res) => {
+		// check the validation object for errors
+		let errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+			return res.status(422).json({ errors: errors.array() });
+		}
+
+		let hashedPassword = Users.hashPassword(req.body.Password);
+
+		Users.findOneAndUpdate(
+			{ Username: req.params.Username },
+			{
+				$set: {
+					Username: req.body.Username,
+					Password: hashedPassword,
+					Email: req.body.Email,
+					Birthday: req.body.Birthday,
+				},
+			},
+			{ new: true }, // This line makes sure that the updated document is returned
+			(err, updatedUser) => {
+				if (err) {
+					// also .then .catch function is possible here
+					console.error(err);
+					res.status(500).send("Error: " + err);
+				} else {
+					res.json(updatedUser);
+				}
+			}
+		);
+	}
+);
+
+// Post Movie
 app.post(
 	"/users/:Username/movies/:MovieID",
 	[
@@ -177,48 +219,8 @@ app.post(
 	}
 );
 
-// Update a user's info
-app.put(
-	"/users/:Username",
-	[
-		check("Username", "Username is required").isLength({ min: 5 }),
-		check("Username", "Username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
-		check("Password", "Password is required").not().isEmpty(),
-		check("Email", "Email does not appear to be valid").isEmail(),
-	],
-	(req, res) => {
-		// check the validation object for errors
-		let errors = validationResult(req);
-
-		if (!errors.isEmpty()) {
-			return res.status(422).json({ errors: errors.array() });
-		}
-		Users.findOneAndUpdate(
-			{ Username: req.params.Username },
-			{
-				$set: {
-					Username: req.body.Username,
-					Password: req.body.Password,
-					Email: req.body.Email,
-					Birthday: req.body.Birthday,
-				},
-			},
-			{ new: true }, // This line makes sure that the updated document is returned
-			(err, updatedUser) => {
-				if (err) {
-					// also .then .catch function is possible here
-					console.error(err);
-					res.status(500).send("Error: " + err);
-				} else {
-					res.json(updatedUser);
-				}
-			}
-		);
-	}
-);
-
 // Delete a user by username
-app.delete("/users/:Username", (req, res) => {
+app.delete("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Users.findOneAndRemove({ Username: req.params.Username })
 		.then((user) => {
 			if (!user) {
