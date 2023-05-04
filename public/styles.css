@@ -1,0 +1,83 @@
+/* CSS Stylesheet for Movie App */
+
+/* Reset default margin and padding */
+* {
+	margin: 0;
+	padding: 0;
+}
+
+/* Define basic styles for the body element */
+body {
+	font-family: Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.4;
+	background-color: #f8f8f8;
+}
+
+/* Define styles for the header element */
+header {
+	background-color: #333;
+	color: #fff;
+	padding: 20px;
+}
+
+/* Define styles for the h1 element */
+h1 {
+	font-size: 36px;
+	margin-bottom: 20px;
+}
+
+/* Define styles for the h2 element */
+h2 {
+	font-size: 24px;
+	margin-bottom: 10px;
+}
+
+/* Define styles for the table element */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+/* Define styles for the th element */
+th {
+	background-color: #495a38;
+	color: #fff;
+	padding: 10px;
+	text-align: left;
+}
+
+/* Define styles for the td element */
+td {
+	border: 1px solid #ccc;
+	padding: 10px;
+}
+
+/* Define styles for the ul element */
+ul {
+	list-style: disc;
+	margin-left: 20px;
+	margin-bottom: 20px;
+}
+
+/* Define styles for the li element */
+li {
+	margin-bottom: 10px;
+}
+
+/* Define styles for the a element */
+a {
+	color: #333;
+	text-decoration: none;
+}
+
+/* Define styles for the a:hover element */
+a:hover {
+	text-decoration: underline;
+}
+
+/* Define styles for the form element */
+form {
+	margin-top: 20px;
+}

@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Models = require("./models.js");
 const Movies = Models.Movie;
 const Users = Models.User;
+require("dotenv").config();
 
 // HEROKU
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -11,8 +12,6 @@ const { check, validationResult } = require("express-validator");
 
 const fs = require("fs");
 const path = require("path");
-
-require("dotenv").config();
 
 const express = require("express");
 (app = express()), (morgan = require("morgan")), (bodyParser = require("body-parser")), (uuid = require("uuid"));
@@ -31,7 +30,9 @@ app.use(cors());
 
 // GET route for the root endpoint
 app.get("/", (req, res) => {
-	res.send("Hello and welcome to my My Movie App! <br><br> Click <a href='/documentation'>here</a> for documentation.");
+	res.send(
+		"Hello and welcome to my My Movie App! <br><br> Click <a href='/documentation.html'>here</a> for documentation."
+	);
 });
 
 // Get all movies
