@@ -21,12 +21,27 @@ require("./passport");
 app.use(express.static("public"));
 app.use(morgan("common"));
 app.use(morgan("dev"));
+const cors = require("cors");
+
+let allowedOrigins = ["https://movieappskogaby.herokuapp.com", "http://localhost:1234", "http://localhost:8080"];
+
+app.use(
+	cors({
+		origin: (origin, callback) => {
+			if (!origin) return callback(null, true);
+			if (allowedOrigins.indexOf(origin) === -1) {
+				// If a specific origin isn’t found on the list of allowed origins
+				let message = "The CORS policy for this application doesnt allow access from origin " + origin;
+				return callback(new Error(message), false);
+			}
+			return callback(null, true);
+		},
+	})
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 let auth = require("./auth")(app);
-const cors = require("cors");
-app.use(cors());
 
 // GET route for the root endpoint
 app.get("/", (req, res) => {
