@@ -23,7 +23,12 @@ app.use(morgan("common"));
 app.use(morgan("dev"));
 const cors = require("cors");
 
-let allowedOrigins = ["https://movieappskogaby.herokuapp.com", "http://localhost:1234", "http://localhost:8080"];
+let allowedOrigins = [
+	"https://movieappskogaby.herokuapp.com",
+	"http://localhost:1234",
+	"http://localhost:8080",
+	"http://localhost:4200",
+];
 
 app.use(
 	cors({
