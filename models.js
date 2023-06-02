@@ -15,6 +15,7 @@ const movieSchema = mongoose.Schema({
 	Actors: [String],
 	ImagePath: String,
 	Featured: Boolean,
+	imageURL: String,
 });
 
 const userSchema = mongoose.Schema({
