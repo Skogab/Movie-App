@@ -269,6 +269,26 @@ app.delete("/users/:Username", passport.authenticate("jwt", { session: false }),
 		});
 });
 
+// Delete a movie from a user's favorites
+app.delete("/users/:Username/movies/:MovieID", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Users.findOneAndUpdate(
+		{ Username: req.params.Username },
+		{ $pull: { FavoriteMovies: req.params.MovieID } },
+		{ new: true }
+	)
+		.then((updatedUser) => {
+			if (!updatedUser) {
+				res.status(404).json({ error: "User not found" });
+			} else {
+				res.status(200).json(updatedUser);
+			}
+		})
+		.catch((err) => {
+			console.error(err);
+			res.status(500).json({ error: "Error removing movie from favorites" });
+		});
+});
+
 // listen
 const port = process.env.PORT || 8080;
 app.listen(port, "0.0.0.0", () => {
