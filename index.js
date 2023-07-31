@@ -253,6 +253,8 @@ app.post(
 	}
 );
 
+// Endpoint for the images withh put method
+
 // Delete a user by username
 app.delete("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Users.findOneAndRemove({ Username: req.params.Username })
@@ -270,23 +272,30 @@ app.delete("/users/:Username", passport.authenticate("jwt", { session: false }),
 });
 
 // Delete a movie from a user's favorites
-app.delete("/users/:Username/movies/:MovieID", passport.authenticate("jwt", { session: false }), (req, res) => {
-	Users.findOneAndUpdate(
-		{ Username: req.params.Username },
-		{ $pull: { FavoriteMovies: req.params.MovieID } },
-		{ new: true }
-	)
-		.then((updatedUser) => {
-			if (!updatedUser) {
-				res.status(404).json({ error: "User not found" });
-			} else {
-				res.status(200).json(updatedUser);
-			}
-		})
-		.catch((err) => {
-			console.error(err);
-			res.status(500).json({ error: "Error removing movie from favorites" });
+app.delete("/users/:Username/movies/:MovieID", passport.authenticate("jwt", { session: false }), async (req, res) => {
+	try {
+		// Find the user with the provided Username and update their FavoriteMovies array
+		const updatedUser = await Users.findOneAndUpdate(
+			{ Username: req.params.Username },
+			{ $pull: { FavoriteMovies: req.params.MovieID } },
+			{ new: true }
+		);
+
+		// If the user is not found, return a 404 Not Found response
+		if (!updatedUser) {
+			return res.status(404).json({ error: "User not found" });
+		}
+
+		// User successfully updated, send the updated user as the response
+		res.status(200).json(updatedUser);
+	} catch (error) {
+		// Handle any errors that occur during the update operation
+		console.error(error);
+		res.status(500).json({
+			error: "Error removing movie from favorites",
+			details: error.message,
 		});
+	}
 });
 
 // listen
