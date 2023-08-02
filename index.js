@@ -1,3 +1,4 @@
+// Erforderliche Module importieren
 const mongoose = require("mongoose");
 const Models = require("./models.js");
 const Movies = Models.Movie;
@@ -30,13 +31,14 @@ let allowedOrigins = [
 	"http://localhost:4200",
 ];
 
+// CORS-Middleware
 app.use(
 	cors({
 		origin: (origin, callback) => {
 			if (!origin) return callback(null, true);
 			if (allowedOrigins.indexOf(origin) === -1) {
-				// If a specific origin isn’t found on the list of allowed origins
-				let message = "The CORS policy for this application doesnt allow access from origin " + origin;
+				// Wenn ein bestimmter Ursprung nicht in der Liste der erlaubten Ursprünge gefunden wird
+				let message = "The CORS policy for this application doesnt allow access from origin" + origin;
 				return callback(new Error(message), false);
 			}
 			return callback(null, true);
@@ -44,18 +46,31 @@ app.use(
 	})
 );
 
+// Body-Parser-Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Authentifizierungsmiddleware importieren und einrichten
 let auth = require("./auth")(app);
 
-// GET route for the root endpoint
+/**
+ * @route GET /
+ * @group Allgemein - Allgemeine Endpunkte
+ * @returns {string} 200 - Willkommensnachricht mit einem Link zur Dokumentation
+ */
 app.get("/", (req, res) => {
 	res.send(
 		"Hello and welcome to my My Movie App! <br><br> Click <a href='/documentation.html'>here</a> for documentation."
 	);
 });
 
-// Get all movies
+/**
+ * @route GET /movies
+ * @group Filme - Operationen im Zusammenhang mit Filmen
+ * @returns {Array<Object>} 200 - Ein Array von Filmobjekten
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.get("/movies", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Movies.find()
 		.then((movies) => {
@@ -67,7 +82,14 @@ app.get("/movies", passport.authenticate("jwt", { session: false }), (req, res) 
 		});
 });
 
-// Get a movie by title
+/**
+ * @route GET /movies/:title
+ * @group Filme - Operationen im Zusammenhang mit Filmen
+ * @param {string} title.path.required - Der Titel des Films
+ * @returns {Object} 200 - Das Filmobjekt mit dem angegebenen Titel
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.get("/movies/:title", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Movies.findOne({
 		Title: req.params.title,
@@ -81,7 +103,14 @@ app.get("/movies/:title", passport.authenticate("jwt", { session: false }), (req
 		});
 });
 
-/// Get movies by genre
+/**
+ * @route GET /movies/genre/:genre
+ * @group Filme - Operationen im Zusammenhang mit Filmen
+ * @param {string} genre.path.required - Das Genre der abzurufenden Filme
+ * @returns {Array<Object>} 200 - Ein Array von Filmobjekten mit dem angegebenen Genre
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.get("/movies/genre/:genre", passport.authenticate("jwt", { session: false }), (req, res) => {
 	const genre = req.params.genre;
 	Movies.find({ "Genre.Name": genre })
@@ -94,7 +123,14 @@ app.get("/movies/genre/:genre", passport.authenticate("jwt", { session: false })
 		});
 });
 
-// Get movies by director
+/**
+ * @route GET /movies/director/:director
+ * @group Filme - Operationen im Zusammenhang mit Filmen
+ * @param {string} director.path.required - Der Name des Regisseurs
+ * @returns {Array<Object>} 200 - Ein Array von Filmobjekten, die von dem angegebenen Regisseur gedreht wurden
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.get("/movies/director/:director", passport.authenticate("jwt", { session: false }), (req, res) => {
 	const director = req.params.director;
 	Movies.find({ "Director.Name": director })
@@ -103,11 +139,17 @@ app.get("/movies/director/:director", passport.authenticate("jwt", { session: fa
 		})
 		.catch((err) => {
 			console.error(err);
-			res.status(500).send("Error: " + err);
+			res.status(500).send("Fehler: " + err);
 		});
 });
 
-// Get all users
+/**
+ * @route GET /users
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @returns {Array<Object>} 201 - Ein Array von Benutzerobjekten
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Users.find()
 		.then((users) => {
@@ -115,11 +157,18 @@ app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) =
 		})
 		.catch((err) => {
 			console.error(err);
-			res.status(500).send("Error: " + err);
+			res.status(500).send("Fehler: " + err);
 		});
 });
 
-// Get a user by username
+/**
+ * @route GET /users/:Username
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @param {string} Username.path.required - Der Benutzername des Benutzers
+ * @returns {Object} 200 - Das Benutzerobjekt mit dem angegebenen Benutzernamen
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.get("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Users.findOne({ Username: req.params.Username })
 		.then((user) => {
@@ -127,31 +176,62 @@ app.get("/users/:Username", passport.authenticate("jwt", { session: false }), (r
 		})
 		.catch((err) => {
 			console.error(err);
-			res.status(500).send("Error: " + err);
+			res.status(500).send("Fehler: " + err);
 		});
 });
 
-//Add a user
+/**
+ * @route GET /profiles/:Username
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @param {string} Username.path.required - Der Benutzername des Benutzers
+ * @returns {Object} 200 - Das Benutzerobjekt mit dem angegebenen Benutzernamen
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
+app.get("/profiles/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Users.findOne({ Username: req.params.Username })
+		.then((user) => {
+			if (!user) {
+				return res.status(404).json({ error: "User not found" });
+			}
+			res.status(200).json(user);
+		})
+		.catch((err) => {
+			console.error(err);
+			res.status(500).send("Fehler: " + err);
+		});
+});
+
+/**
+ * @route POST /users
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @param {string} Username.body.required - Der Benutzername des neuen Benutzers
+ * @param {string} Password.body.required - Das Passwort des neuen Benutzers
+ * @param {string} Email.body.required - Die E-Mail-Adresse des neuen Benutzers
+ * @param {string} Birthday.body - Das Geburtsdatum des neuen Benutzers
+ * @returns {Object} 201 - Das neu erstellte Benutzerobjekt
+ * @returns {Object} 422 - Validierungsfehler
+ */
 app.post(
 	"/users",
 	[
-		check("Username", "Username is required").isLength({ min: 5 }),
+		check("Username", "BUsername is required").isLength({ min: 5 }),
 		check("Username", "Username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
 		check("Password", "Password is required").not().isEmpty(),
 		check("Email", "Email does not appear to be valid").isEmail(),
 	],
 	(req, res) => {
-		// check the validation object for errors
+		// Validierungsergebnisse überprüfen
 		let errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
 			return res.status(422).json({ errors: errors.array() });
 		}
 		let hashedPassword = Users.hashPassword(req.body.Password);
-		Users.findOne({ Username: req.body.Username }) // Search to see if a user with the requested username already exists
+		Users.findOne({ Username: req.body.Username }) // Überprüfen, ob bereits ein Benutzer mit dem angeforderten Benutzernamen vorhanden ist
 			.then((user) => {
 				if (user) {
-					//If the user is found, send a response that it already exists
+					// Wenn der Benutzer gefunden wurde, eine Antwort senden, dass er bereits existiert
 					return res.status(400).send(req.body.Username + " already exists");
 				} else {
 					Users.create({
@@ -176,7 +256,17 @@ app.post(
 	}
 );
 
-// Update a user's info
+/**
+ * @route PUT /users/:Username
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @param {string} Username.path.required - Der Benutzername des zu aktualisierenden Benutzers
+ * @param {string} Username.body.required - Der aktualisierte Benutzername
+ * @param {string} Password.body.required - Das aktualisierte Passwort
+ * @param {string} Email.body.required - Die aktualisierte E-Mail-Adresse
+ * @param {string} Birthday.body - Das aktualisierte Geburtsdatum
+ * @returns {Object} 200 - Das aktualisierte Benutzerobjekt
+ * @returns {Object} 422 - Validierungsfehler
+ */
 app.put(
 	"/users/:Username",
 	[
@@ -186,7 +276,7 @@ app.put(
 		check("Email", "Email does not appear to be valid").isEmail(),
 	],
 	(req, res) => {
-		// check the validation object for errors
+		// Validierungsergebnisse überprüfen
 		let errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
@@ -205,10 +295,9 @@ app.put(
 					Birthday: req.body.Birthday,
 				},
 			},
-			{ new: true }, // This line makes sure that the updated document is returned
+			{ new: true }, // Diese Zeile stellt sicher, dass das aktualisierte Dokument zurückgegeben wird
 			(err, updatedUser) => {
 				if (err) {
-					// also .then .catch function is possible here
 					console.error(err);
 					res.status(500).send("Error: " + err);
 				} else {
@@ -219,7 +308,14 @@ app.put(
 	}
 );
 
-// Post Movie
+/**
+ * @route POST /users/:Username/movies/:MovieID
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @param {string} Username.path.required - Der Benutzername des Benutzers, dem der Film hinzugefügt werden soll
+ * @param {string} MovieID.path.required - Die ID des Films, der zu den Favoriten des Benutzers hinzugefügt werden soll
+ * @returns {Object} 200 - Das aktualisierte Benutzerobjekt mit dem hinzugefügten Film in der Favoritenliste
+ * @returns {Object} 422 - Validierungsfehler
+ */
 app.post(
 	"/users/:Username/movies/:MovieID",
 	[
@@ -229,7 +325,7 @@ app.post(
 		check("Email", "Email does not appear to be valid").isEmail(),
 	],
 	(req, res) => {
-		// check the validation object for errors
+		// Validierungsergebnisse überprüfen
 		let errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
@@ -240,7 +336,7 @@ app.post(
 			{
 				$push: { FavoriteMovies: req.params.MovieID },
 			},
-			{ new: true }, // This line makes sure that the updated document is returned
+			{ new: true }, // Diese Zeile stellt sicher, dass das aktualisierte Dokument zurückgegeben wird
 			(err, updatedUser) => {
 				if (err) {
 					console.error(err);
@@ -253,9 +349,15 @@ app.post(
 	}
 );
 
-// Endpoint for the images withh put method
-
-// Delete a user by username
+/**
+ * @route DELETE /users/:Username
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @param {string} Username.path.required - Der Benutzername des zu löschenden Benutzers
+ * @returns {string} 200 - Eine Bestätigungsnachricht, dass der Benutzer gelöscht wurde
+ * @returns {string} 400 - Eine Fehlermeldung, dass der Benutzer nicht gefunden wurde
+ * @returns {Error} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.delete("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
 	Users.findOneAndRemove({ Username: req.params.Username })
 		.then((user) => {
@@ -271,25 +373,34 @@ app.delete("/users/:Username", passport.authenticate("jwt", { session: false }),
 		});
 });
 
-// Delete a movie from a user's favorites
+/**
+ * @route DELETE /users/:Username/movies/:MovieID
+ * @group Benutzer - Operationen im Zusammenhang mit Benutzern
+ * @param {string} Username.path.required - Der Benutzername des Benutzers, aus dessen Favoritenliste der Film entfernt werden soll
+ * @param {string} MovieID.path.required - Die ID des Films, der aus der Favoritenliste des Benutzers entfernt werden soll
+ * @returns {Object} 200 - Das aktualisierte Benutzerobjekt ohne den entfernten Film in der Favoritenliste
+ * @returns {Object} 404 - Eine Fehlermeldung, dass der Benutzer nicht gefunden wurde oder der Film nicht in der Favoritenliste enthalten war
+ * @returns {Object} 500 - Eine Fehlermeldung
+ * @security JWT
+ */
 app.delete("/users/:Username/movies/:MovieID", passport.authenticate("jwt", { session: false }), async (req, res) => {
 	try {
-		// Find the user with the provided Username and update their FavoriteMovies array
+		// Den Benutzer mit dem angegebenen Benutzernamen finden und das FavoriteMovies-Array aktualisieren
 		const updatedUser = await Users.findOneAndUpdate(
 			{ Username: req.params.Username },
 			{ $pull: { FavoriteMovies: req.params.MovieID } },
 			{ new: true }
 		);
 
-		// If the user is not found, return a 404 Not Found response
+		// Wenn der Benutzer nicht gefunden wurde, eine 404 Not Found-Antwort senden
 		if (!updatedUser) {
 			return res.status(404).json({ error: "User not found" });
 		}
 
-		// User successfully updated, send the updated user as the response
+		// Benutzer erfolgreich aktualisiert, das aktualisierte Benutzerobjekt als Antwort senden
 		res.status(200).json(updatedUser);
 	} catch (error) {
-		// Handle any errors that occur during the update operation
+		// Fehler bei der Aktualisierungsoperation behandeln
 		console.error(error);
 		res.status(500).json({
 			error: "Error removing movie from favorites",
@@ -298,7 +409,7 @@ app.delete("/users/:Username/movies/:MovieID", passport.authenticate("jwt", { se
 	}
 });
 
-// listen
+// Server auf Port starten
 const port = process.env.PORT || 8080;
 app.listen(port, "0.0.0.0", () => {
 	console.log("Listening on Port " + port);
