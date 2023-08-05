@@ -29,23 +29,26 @@ let allowedOrigins = [
 	"http://localhost:1234",
 	"http://localhost:8080",
 	"http://localhost:4200",
-	"skogab-myflix.netlify.app",
+	"https://skogab-myflix.netlify.app",
 ];
 
-// CORS-Middleware
-app.use(
-	cors({
-		origin: (origin, callback) => {
-			if (!origin) return callback(null, true);
-			if (allowedOrigins.indexOf(origin) === -1) {
-				// Wenn ein bestimmter Ursprung nicht in der Liste der erlaubten Ursprünge gefunden wird
-				let message = "The CORS policy for this application doesnt allow access from origin" + origin;
-				return callback(new Error(message), false);
-			}
-			return callback(null, true);
-		},
-	})
-);
+// ALL origins have access (default)
+app.use(cors());
+
+// CORS-Middleware only certain origins have acces
+//app.use(
+//	cors({
+//		origin: (origin, callback) => {
+//			if (!origin) return callback(null, true);
+//			if (allowedOrigins.indexOf(origin) === -1) {
+//				// Wenn ein bestimmter Ursprung nicht in der Liste der erlaubten Ursprünge gefunden wird
+//				let message = "The CORS policy for this application doesnt allow access from origin" + origin;
+//				return callback(new Error(message), false);
+//			}
+//			return callback(null, true);
+//		},
+//	})
+//);
 
 // Body-Parser-Middleware
 app.use(bodyParser.json());
